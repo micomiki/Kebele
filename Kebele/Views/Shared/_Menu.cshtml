@@ -1,0 +1,18 @@
+﻿
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore
+@using Kebele.Data
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item dropdown show">
+        <a class="dropdown-toggle nav-link text-dark" href="#" data-toggle="dropdown">Managment</a>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" asp-controller="citizen" asp-action="Create">Generate SSN</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" asp-controller="Citizen" asp-action="Index">Citizen Managment</a>
+        </div>
+    </li>
+}
