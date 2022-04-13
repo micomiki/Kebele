@@ -15,16 +15,21 @@ namespace Kebele.Models
 
        [Key,DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int SSN { get; set; }
+        [Display(Name = "Image Path")]
+        
+        public string Image { get; set; }
 
-        [RegularExpression(@"^[A-Za-z]+[a-zA-Z\s]*$")]
+        [RegularExpression(@"^[A-Za-z]+[a-zA-Z\s]*$", ErrorMessage = "Input Field Accept Alphabet Only")]
         [Display(Name = "First Name")]
         [Required]
         [DataType(DataType.Text)]
         public string First_Name { get; set; }
+        [RegularExpression(@"^[A-Za-z]+[a-zA-Z\s]*$", ErrorMessage = "Input Field Accept Alphabet Only")]
         [Display(Name = "Middle Name")]
         [Required]
         [DataType(DataType.Text)]
         public string Mid_Name { get; set; }
+        [RegularExpression(@"^[A-Za-z]+[a-zA-Z\s]*$", ErrorMessage = "Input Field Accept Alphabet Only")]
         [Display(Name = "Last Name")]
         [Required]
         [DataType(DataType.Text)]

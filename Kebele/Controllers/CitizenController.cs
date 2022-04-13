@@ -22,6 +22,9 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.EntityFrameworkCore;
 //using Microsoft.AspNet.Identity;
 
 namespace Kebele.Controllers
@@ -51,24 +54,9 @@ namespace Kebele.Controllers
             CitizenApiUrlCity = config.GetValue<string>("AppSettingCity:CitizenApiUrl");
             CitizenApiUrlSSN = config.GetValue<string>("AppSettingSSN:CitizenApiUrl");
             _context = context;
+            _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             _userManager = userManager;
             
-        }
-        public async Task<IActionResult> fil()
-        {
-           
-            HttpResponseMessage response = await client.GetAsync(CitizenApiUrl);
-            string stringdata = await response.Content.ReadAsStringAsync();
-            var option = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-            
-            
-            List<Citizen> data = JsonSerializer.Deserialize<List<Citizen>>(stringdata, option);
-            ViewBag.Success = TempData["Success"];
-
-            return View(data);
         }
         public async Task<IActionResult> Create()
         {
@@ -99,8 +87,9 @@ namespace Kebele.Controllers
        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Citizen citizen)
+        public async Task<IActionResult> Create(Citizen citizen, IFormFile uploadFile)
         {
+
             //ModelState.AddModelError("Error", "Citizen already Registerd");
             if (ModelState.IsValid)
             {
@@ -152,6 +141,38 @@ namespace Kebele.Controllers
                     //string userEmail = applicationUser?.Email;
 
                     // Write citizen to ssnbcims using api
+                    var myAccount = new Account { ApiKey = "252913248958243", ApiSecret = "MGKYMIU32tEfc_x7q_gXp-iIhEQ", Cloud = "dmkfslxl5" };
+                    Cloudinary _cloudinary = new Cloudinary(myAccount);
+                    var filePath = "";
+                    var fileName = "";
+                    if (uploadFile != null && uploadFile.Length > 0)
+                    {
+                        fileName = Path.GetFileName(uploadFile.FileName);
+                        filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                        //var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                        //image.Path = filePath;
+
+
+
+                        using (var fileSrteam = new FileStream(filePath, FileMode.Create))
+                        {
+                            await uploadFile.CopyToAsync(fileSrteam);
+                        }
+                        var uploadParams = new ImageUploadParams()
+                        {
+                            //File = new FileDescription(@"C:\Users\mico\Videos\2.jpg")
+                            File = new FileDescription(filePath)
+                        ,
+                            Transformation = new Transformation().Width(200).Height(200)//.Crop("thumb").Gravity("face")
+                        };
+                        var uploadResult = _cloudinary.Upload(uploadParams);
+                        var link = uploadResult.SecureUri.AbsoluteUri;
+                        citizen.Image = link;
+                    }
+
+
+                    
+
                     string stringdata = JsonSerializer.Serialize(citizen);
                     var contentdata = new StringContent(stringdata, System.Text.Encoding.UTF8, "application/json");
                     HttpResponseMessage response = await client.PostAsync(CitizenApiUrl, contentdata);
@@ -211,6 +232,129 @@ namespace Kebele.Controllers
             List<Citizen> data = JsonSerializer.Deserialize<List<Citizen>>(stringdata, options);
 
             return View(data);
+        }
+        public async Task<IActionResult> Edit(int id)
+        {
+            HttpResponseMessage response = await client.GetAsync($"{CitizenApiUrl}/{id}");
+            string stringdata = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            Citizen citizen = JsonSerializer.Deserialize<Citizen>(stringdata, options);
+            ViewBag.image = citizen.Image ;
+            return View(citizen);
+        }
+        public async Task<IActionResult> Detail(int id)
+        {
+            HttpResponseMessage response = await client.GetAsync($"{CitizenApiUrl}/{id}");
+            string stringdata = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            Citizen citizen = JsonSerializer.Deserialize<Citizen>(stringdata, options);
+            return View(citizen);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Citizen citizen, IFormFile uploadFile)
+        {
+         
+            if (ModelState.IsValid)
+            {
+                HttpResponseMessage responseCity = await client.GetAsync(CitizenApiUrlCity);
+                string stringdatacity = await responseCity.Content.ReadAsStringAsync();
+                var option = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                List<City> data = JsonSerializer.Deserialize<List<City>>(stringdatacity, option);
+
+
+                var ident = _context.Citizens.FirstOrDefault(m => m.First_Name == citizen.First_Name && m.Mid_Name == citizen.Mid_Name && m.Last_Name == citizen.Last_Name && m.DOB == citizen.DOB );
+                var difssn = _context.Citizens.Any(o => o.SSN != citizen.SSN);
+            
+                   
+                        if (ident?.SSN != citizen.SSN && ident != null)
+                        {
+                            ViewBag.Message = "Citizen Already Registerd";
+                            return View();
+
+                        }
+                    
+
+                    else
+                    {
+                    var myAccount = new Account { ApiKey = "252913248958243", ApiSecret = "MGKYMIU32tEfc_x7q_gXp-iIhEQ", Cloud = "dmkfslxl5" };
+                    Cloudinary _cloudinary = new Cloudinary(myAccount);
+                    var filePath = "";
+                    var fileName = "";
+                    if (uploadFile != null && uploadFile.Length > 0)
+                    {
+                        fileName = Path.GetFileName(uploadFile.FileName);
+                        filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                        //var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                        //image.Path = filePath;
+
+
+
+                        using (var fileSrteam = new FileStream(filePath, FileMode.Create))
+                        {
+                            await uploadFile.CopyToAsync(fileSrteam);
+                        }
+                        var uploadParams = new ImageUploadParams()
+                        {
+                            //File = new FileDescription(@"C:\Users\mico\Videos\2.jpg")
+                            File = new FileDescription(filePath)
+                        ,
+                            Transformation = new Transformation().Width(200).Height(200)//.Crop("thumb").Gravity("face")
+                        };
+                        var uploadResult = _cloudinary.Upload(uploadParams);
+                        var link = uploadResult.SecureUri.AbsoluteUri;
+                        citizen.Image = link;
+                    }
+                    var userid = _userManager.GetUserId(HttpContext.User);
+                        ApplicationUser user = (ApplicationUser)_userManager.FindByIdAsync(userid).Result;
+                        citizen.Kebele = user.Kebele;
+                        citizen.Woreda = user.Woreda;
+                        citizen.CityCode = user.CityCode;
+                        citizen.City = user.City;
+                        citizen.SubCity = user.SubCity;
+
+                        string stringdata = JsonSerializer.Serialize(citizen);
+                        var contentdata = new StringContent(stringdata, System.Text.Encoding.UTF8, "application/json");
+                        HttpResponseMessage response = await client.PutAsync($"{CitizenApiUrl}/{citizen.SSN}", contentdata);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var dob = citizen.DOB;
+                            int age = 0;
+                            age = DateTime.Now.Subtract(dob).Days;
+                            age = age / 365;
+                            citizen.Age = age;
+                            var citn = data.FirstOrDefault(m => m.Code == citizen.CityCode);
+                            citizen.City = citn.Name;
+
+                        // ssn update
+
+
+
+                        
+                        _context.Update(citizen);
+                            await _context.SaveChangesAsync();
+                            TempData["Success"] = "Citizen Information Updated Successfuly";
+                            return RedirectToAction(nameof(Index));
+                        }
+                        else
+                        {
+                            ViewBag.Message = "Error While calling api";
+                        }
+                    }
+                
+            }
+            return RedirectToAction(nameof(Index));
         }
       
 

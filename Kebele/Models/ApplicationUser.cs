@@ -16,11 +16,11 @@ namespace Kebele.Models
         [DataType(DataType.Text)]
         [Required]
         public string City { get; set; }
-
+        [RegularExpression(@"^[A-Za-z]+[a-zA-Z\s]*$",ErrorMessage ="Input Field Accept Alphabet Only")]
         [DataType(DataType.Text)]
         [Required]
         public string SubCity { get; set; }
-
+        [RegularExpression(@"^[A-Za-z]+[a-zA-Z\s]*$", ErrorMessage = "Input Field Accept Alphabet Only")]
         [DataType(DataType.Text)]
         [Required]
         public string Woreda { get; set; }
