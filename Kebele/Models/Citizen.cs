@@ -5,19 +5,31 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 
 namespace Kebele.Models
 {
     public class Citizen
     {
-       
-        [Key]
+
+       [Key,DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int SSN { get; set; }
+        [Display(Name = "Image Path")]
+        
+        public string Image { get; set; }
+
+        [RegularExpression(@"^[A-Za-z]+[a-zA-Z\s]*$", ErrorMessage = "Input Field Accept Alphabet Only")]
         [Display(Name = "First Name")]
         [Required]
         [DataType(DataType.Text)]
         public string First_Name { get; set; }
+        [RegularExpression(@"^[A-Za-z]+[a-zA-Z\s]*$", ErrorMessage = "Input Field Accept Alphabet Only")]
+        [Display(Name = "Middle Name")]
+        [Required]
+        [DataType(DataType.Text)]
+        public string Mid_Name { get; set; }
+        [RegularExpression(@"^[A-Za-z]+[a-zA-Z\s]*$", ErrorMessage = "Input Field Accept Alphabet Only")]
         [Display(Name = "Last Name")]
         [Required]
         [DataType(DataType.Text)]
@@ -35,12 +47,13 @@ namespace Kebele.Models
         [Display(Name = "City")]
         public string City { get; set; }
 
-        [Required]
+       
         [DataType(DataType.Text)]
+        public string SubCity { get; set; }
+
+
         public string Woreda { get; set; }
 
-        [Required]
-        [Range(0, 99)]
         public int Kebele { get; set; }
 
         [Display(Name = "Blood Type")]
@@ -58,6 +71,8 @@ namespace Kebele.Models
         public int Age { get; set; }
         [NotMapped]
         public virtual ICollection<SelectListItem> Citiy { get; set; }
-    
+        
+
+
     }
 }

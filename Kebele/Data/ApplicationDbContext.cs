@@ -1,4 +1,5 @@
 ﻿using Kebele.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -7,13 +8,14 @@ using System.Text;
 
 namespace Kebele.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityUserContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
         public DbSet<Citizen> Citizens { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
          
     }

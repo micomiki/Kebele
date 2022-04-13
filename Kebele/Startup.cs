@@ -1,6 +1,8 @@
 using Kebele.Data;
+using Kebele.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -30,7 +32,7 @@ namespace Kebele
         public void ConfigureServices(IServiceCollection services)
         {
             HttpClient client = new HttpClient();
-            string baseUrl = Configuration.GetValue<string>("AppSettings:BaseUrl");
+            string baseUrl = Configuration.GetValue<string>("AppSettingCitizen:BaseUrl");
             client.BaseAddress = new Uri(baseUrl);
             var contenttype = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contenttype);
@@ -43,7 +45,9 @@ namespace Kebele
 
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            //services.AddIdentity<ApplicationUser, IdentityRole>();
             services.AddControllersWithViews();
+          
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

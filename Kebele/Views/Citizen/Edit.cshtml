@@ -1,21 +1,16 @@
 ﻿@model Kebele.Models.Citizen
-@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Edit";
 }
 
-<h1>Create</h1>
-
+<h1>Edit</h1>
 
 <h4>Citizen</h4>
-
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
             @if (ViewBag.Message != null)
             {
                 <div class="alert alert-success alert-danger">
@@ -23,16 +18,13 @@
                     <strong>Error!</strong> @ViewBag.Message
                 </div>
             }
-            <div asp-validation-summary="All" class="text-danger"></div>
-
-            <input type="hidden" asp-for="SSN" class="form-control" value="100000000" />
-            
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="SSN" type="hidden" />
             <div class="form-group">
                 <label asp-for="Image" class="control-label"></label>
                 <input asp-for="Image" class="form-control" type="file" name="uploadFile" />
                 <span asp-validation-for="Image" class="text-danger"></span>
             </div>
-
             <div class="form-group">
                 <label asp-for="First_Name" class="control-label"></label>
                 <input asp-for="First_Name" class="form-control" />
@@ -53,7 +45,6 @@
                 <input asp-for="DOB" class="form-control" />
                 <span asp-validation-for="DOB" class="text-danger"></span>
             </div>
-
             <div class="form-group">
                 <label asp-for="Blood_Type" class="control-label"></label>
                 <select asp-for="Blood_Type" class="form-control " asp-items="@Kebele.Utility.Helper.GetBloodType()">
@@ -68,7 +59,7 @@
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -78,10 +69,6 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-
-
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-
 }
